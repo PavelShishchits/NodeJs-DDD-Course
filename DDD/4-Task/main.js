@@ -1,10 +1,10 @@
-import server from './connections/https.js';
+import config from './config.js';
+let server = (await import(`./connections/${config.transport}.js`)).default;  
 import staticServer from './staticServer.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 
-const PORT = 8000;
-const STATIC_SERVER_PORT = 8001;
+console.log(server);
 
 const apiPath = path.join(process.cwd(), './api');
 
@@ -18,8 +18,8 @@ const initApp = async () => {
         const apiName = path.basename(filePath, '.js');
         routing[apiName] = (await import(filePath)).default;
     }
-    staticServer('./static', STATIC_SERVER_PORT);
-    server(routing, PORT);
+    staticServer(config.staticFolder, config.staticServerPort);
+    server(routing, config.serverPort);
 };
 
 initApp();

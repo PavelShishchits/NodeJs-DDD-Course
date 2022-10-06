@@ -1,12 +1,12 @@
 import pg from 'pg';
+import config from './config.js';
 
-// toDo get values from .env
 const pool = new pg.Pool({
-    host: '127.0.0.1',
-    port: 5432,
-    database: 'example',
-    user: 'marcus',
-    password: 'marcus',
+    host: config.dbSettings.host,
+    port: config.dbSettings.params,
+    database: config.dbSettings.database,
+    user: config.dbSettings.user,
+    password: config.dbSettings.password,
 });
 
 const db = (table) => ({

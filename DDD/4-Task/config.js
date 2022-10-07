@@ -9,5 +9,5 @@ export default {
         user: 'marcus',
         password: 'marcus',
     },
-    transport: 'http' // http | ws
+    transport: 'ws' // http | ws
 }

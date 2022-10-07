@@ -4,8 +4,6 @@ import staticServer from './staticServer.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 
-console.log(server);
-
 const apiPath = path.join(process.cwd(), './api');
 
 const routing = {};

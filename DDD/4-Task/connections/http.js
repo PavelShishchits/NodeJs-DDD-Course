@@ -14,10 +14,20 @@ const recieveArgs = async (req) => {
     return JSON.parse(data);
 };
 
+const setCorsHeaders = (res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:8001');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
+    res.setHeader('Access-Control-Max-Age', 2592000); 
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 const server = (routing, port) => {
     // Front controller pattern (единая точка входа для всех запросов)
     http.createServer(async (req, res) => {
+        setCorsHeaders(res);
+
         const { method, url, socket } = req;
+
         const [name, id] = url.substring(1).split('/');
         const entity = routing[name];
         if (!entity) return res.end('Not found');
@@ -25,6 +35,7 @@ const server = (routing, port) => {
         const procedure = crudMap[method.toLowerCase()];
         const handler = entity[procedure];
         if (!handler) return res.end('Not found');
+
         const src = handler.toString();
         const signature = src.substring(0, src.indexOf(')'));
         const args = [];
@@ -33,6 +44,7 @@ const server = (routing, port) => {
         if (signature.includes('{')) args.push(await recieveArgs(req));
 
         logger.dir({
+            socket,
             method,
             url,
             args,

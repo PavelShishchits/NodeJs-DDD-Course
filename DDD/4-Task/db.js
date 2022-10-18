@@ -2,11 +2,11 @@ import pg from 'pg';
 import config from './config.js';
 
 const pool = new pg.Pool({
-    host: config.dbSettings.host,
-    port: config.dbSettings.params,
-    database: config.dbSettings.database,
-    user: config.dbSettings.user,
-    password: config.dbSettings.password,
+    host: config.db.host,
+    port: config.db.port,
+    database: config.db.database,
+    user: config.db.user,
+    password: config.db.password,
 });
 
 const db = (table) => ({

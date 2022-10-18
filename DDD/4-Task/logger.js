@@ -12,6 +12,7 @@ const COLORS = {
 
 class Logger {
     constructor(logPath) {
+        // toDo if folder isn't exist -> create it
         this.path = logPath;
         const date = new Date().toISOString().substring(0, 10);
         const filePath = path.join(this.path, `${date}.log`);

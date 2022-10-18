@@ -14,20 +14,20 @@ const MIME_TYPES = {
     svg: 'image/svg+xml',
 };
 
-const STATIC_PATH = path.join(process.cwd(), './static');
 
 const promiseResponseToBool = [() => true, () => false];
 
 const prepareFile = async (root, url) => {
-    const paths = [path.join(process.cwd(), root), url];
+    const staticPath = path.join(process.cwd(), root);
+    const paths = [staticPath, url];
     if (url.endsWith('/')) paths.push('index.html');
 
     const filePath = path.join(...paths);
-    const pathTraversal = !filePath.startsWith(STATIC_PATH); // check if request for file isn't traverslal (../../...)
+    const pathTraversal = !filePath.startsWith(staticPath); // check if request for file isn't traversal (../../...)
     const exists = await fs.promises.access(filePath).then(...promiseResponseToBool); // check if file exists
     const fileFound = exists && !pathTraversal;
 
-    const streamPath = fileFound ? filePath : STATIC_PATH + '/404.html'
+    const streamPath = fileFound ? filePath : staticPath + '/404.html'
 
     const fileExtention = path.extname(streamPath).replace('.', '');
 
@@ -44,7 +44,6 @@ const server = (root, port) => {
     http.createServer(async (req, res) => {
         const file = await prepareFile(root, req.url);
     
-        console.log(file.fileExtention);
         const statusCode = file.fileFound ? 200 : 404;
         const mimeType = MIME_TYPES[file.fileExtention] || MIME_TYPES.default;
     
@@ -54,7 +53,7 @@ const server = (root, port) => {
     
         file.stream.pipe(res);
     
-        console.log(`Request: ${req.method} ${req.url} ${statusCode}`);
+        console.log(`Static Server Request: ${req.method} ${req.url} ${statusCode}`);
     }).listen(port);
 
     console.log(`Static Server running on PORT:${port}`);

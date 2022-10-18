@@ -1,11 +1,10 @@
 import config from './config.js';
-let server = (await import(`./connections/${config.transport}.js`)).default;  
 import staticServer from './staticServer.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+const server = (await import(`./transport/${config.transport}.js`)).default;
 
-const apiPath = path.join(process.cwd(), './api');
-
+const apiPath = path.join(process.cwd(), config.api.path);
 const routing = {};
 
 const initApp = async () => {
@@ -16,8 +15,8 @@ const initApp = async () => {
         const apiName = path.basename(filePath, '.js');
         routing[apiName] = (await import(filePath)).default;
     }
-    staticServer(config.staticFolder, config.staticServerPort);
-    server(routing, config.serverPort);
+    staticServer(config.static.path, config.static.port);
+    server(routing, config.api.port);
 };
 
-initApp();
+void initApp();

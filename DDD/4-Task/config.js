@@ -1,13 +1,18 @@
 export default {
-    staticServerPort: 8001,
-    staticFolder: './static',
-    serverPort: 8000,
-    dbSettings: {
+    static: {
+        port: 6002,
+        path: './static',
+    },
+    api: {
+        port: 6001,
+        path: './api',
+    },
+    db: {
         host: '127.0.0.1',
         port: 5432,
         database: 'example',
         user: 'marcus',
         password: 'marcus',
     },
-    transport: 'ws' // http | ws
+    transport: 'http' // http | ws
 }

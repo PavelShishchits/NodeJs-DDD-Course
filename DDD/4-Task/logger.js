@@ -1,6 +1,8 @@
-import path from 'node:path';
-import util from 'node:util';
-import fs from 'node:fs';
+'use strict';
+
+const path = require('node:path');
+const util = require('node:util');
+const fs = require('node:fs');
 
 const COLORS = {
     info: '\x1b[1;37m',
@@ -28,7 +30,6 @@ class Logger {
         const date = new Date().toISOString().substring(0, 19);
         const color = COLORS[type];
         const line = date + '\t' + message;
-        console.log(color + line + '\x1b[0m');
         const out = line.replace(/[\n\r]\s*/g, '; ') + '\n';
         this.stream.write(out);
     }
@@ -64,4 +65,5 @@ class Logger {
       }
 }
 
-export default new Logger('./log');
+// toDo get logger path from config
+module.exports = new Logger('./log');

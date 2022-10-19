@@ -1,7 +1,8 @@
-import http from 'node:http';
-import { crudMap } from '../methodsMap.js';
-import { Buffer } from 'node:buffer';
-import logger from '../logger.js';
+'use strict';
+const http = require('node:http');
+const { Buffer } = require('node:buffer');
+// toDo inject logger with DI
+const logger = require('../logger.js');
 
 // вычитывает из сокета все буферы, склеить их, и распарсить в JSON
 const recieveArgs = async (req) => {
@@ -14,6 +15,14 @@ const recieveArgs = async (req) => {
     return JSON.parse(data);
 };
 
+const crudMap = {
+    get: 'read',
+    post: 'create',
+    put: 'update',
+    delete: 'delete'
+};
+
+// toDo refactor to headersCollection and res.writeHeader
 const setCorsHeaders = (res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
@@ -21,7 +30,7 @@ const setCorsHeaders = (res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-const server = (routing, port) => {
+module.exports = (routing, port) => {
     // Front controller pattern (единая точка входа для всех запросов)
     http.createServer(async (req, res) => {
         setCorsHeaders(res);
@@ -56,5 +65,3 @@ const server = (routing, port) => {
 
     console.log(`Api Server running on PORT ${port}`);
 }
-
-export default server;

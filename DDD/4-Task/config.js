@@ -1,4 +1,6 @@
-export default {
+'use strict';
+
+module.exports = {
     static: {
         port: 6002,
         path: './static',
@@ -6,6 +8,7 @@ export default {
     api: {
         port: 6001,
         path: './api',
+        transport: 'http' // http | ws
     },
     db: {
         host: '127.0.0.1',
@@ -14,5 +17,4 @@ export default {
         user: 'marcus',
         password: 'marcus',
     },
-    transport: 'http' // http | ws
 }

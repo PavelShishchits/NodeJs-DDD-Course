@@ -1,6 +1,9 @@
-import { WebSocketServer } from 'ws';
+'use strict';
 
-const server = (routing, port) => {
+const { WebSocketServer } = require('ws');
+
+// toDo inject Logger
+module.exports = (routing, port) => {
   const ws = new WebSocketServer({ port });
 
   ws.on('connection', (connection, req) => {
@@ -25,7 +28,5 @@ const server = (routing, port) => {
     });
   });
 
-  console.log(`API on port ${port}`);
+  console.log(`Api Server running on PORT ${port}`);
 }
-
-export default server;

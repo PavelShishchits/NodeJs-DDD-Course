@@ -1,6 +1,8 @@
-import fs from 'node:fs';
-import http from 'node:http';
-import path from 'node:path';
+'use strict';
+
+const fs = require('node:fs');
+const http = require('node:http');
+const path = require('node:path');
 
 const MIME_TYPES = {
     default: 'application/octet-stream',
@@ -13,7 +15,6 @@ const MIME_TYPES = {
     ico: 'image/x-icon',
     svg: 'image/svg+xml',
 };
-
 
 const promiseResponseToBool = [() => true, () => false];
 
@@ -40,23 +41,21 @@ const prepareFile = async (root, url) => {
     }
 }
 
-const server = (root, port) => {
+module.exports = (root, port) => {
     http.createServer(async (req, res) => {
         const file = await prepareFile(root, req.url);
-    
+
         const statusCode = file.fileFound ? 200 : 404;
         const mimeType = MIME_TYPES[file.fileExtention] || MIME_TYPES.default;
-    
+
         res.writeHead(statusCode, {
             'Content-Type': mimeType,
         });
-    
+
         file.stream.pipe(res);
-    
+
         console.log(`Static Server Request: ${req.method} ${req.url} ${statusCode}`);
     }).listen(port);
 
     console.log(`Static Server running on PORT:${port}`);
 };
-
-export default server;

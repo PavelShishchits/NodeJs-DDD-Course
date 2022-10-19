@@ -1,10 +1,13 @@
-import db from '../db.js';
-import hash from '../hash.js';
-import logger from '../logger.js';
+'use strict';
+
+const db = require('../db.js');
+// toDo inject hash and logger with DI
+const hash = require('../hash.js');
+// const logger = require('../logger.js');
 
 const users = db('users');
 
-export default {
+module.exports = {
     read(id) {
         return users.read(id, ['id', 'login']);
     },

@@ -1,8 +1,9 @@
-import config from './config.js';
-import staticServer from './staticServer.js';
-import path from 'node:path';
-import fs from 'node:fs/promises';
-const server = (await import(`./transport/${config.transport}.js`)).default;
+'use strict';
+const path = require('node:path');
+const fs = require('node:fs/promises');
+const config = require('./config.js');
+const staticServer = require('./staticServer.js');
+const server = require(`./transport/${config.api.transport}.js`);
 
 const apiPath = path.join(process.cwd(), config.api.path);
 const routing = {};
@@ -13,6 +14,7 @@ const initApp = async () => {
         if (!fileName.endsWith('.js')) continue;
         const filePath = path.join(apiPath, fileName);
         const apiName = path.basename(filePath, '.js');
+        // toDo inject db config to db.js through api.js files???
         routing[apiName] = (await import(filePath)).default;
     }
     staticServer(config.static.path, config.static.port);

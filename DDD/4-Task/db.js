@@ -1,5 +1,8 @@
-import pg from 'pg';
-import config from './config.js';
+'use strict';
+
+const pg = require('pg');
+// toDo inject config
+const config = require('./config.js');
 
 const pool = new pg.Pool({
     host: config.db.host,
@@ -53,4 +56,4 @@ const db = (table) => ({
       }
 })
 
-export default db;
+module.exports = db;

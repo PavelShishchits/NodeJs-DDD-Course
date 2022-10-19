@@ -1,3 +1,5 @@
-import db from '../db.js';
+'use strict';
 
-export default db('country');
+const db = require('../db.js');
+
+module.exports = db('country');

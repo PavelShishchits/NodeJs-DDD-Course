@@ -1,33 +1,30 @@
 'use strict';
 
-const db = require('../db.js');
-// toDo inject hash and logger with DI
-const hash = require('../hash.js');
-// const logger = require('../logger.js');
+module.exports = ({ db, common }) => {
+    const userRepository = db('users');
 
-const users = db('users');
+    return {
+        read(id) {
+            return userRepository.read(id, ['id', 'login']);
+        },
 
-module.exports = {
-    read(id) {
-        return users.read(id, ['id', 'login']);
-    },
+        async create({ login, password }) {
+            const passwordHash = await common.hash(password);
+            return userRepository.create({ login, password: passwordHash });
+        },
 
-    async create({ login, password }) {
-        const passwordHash = await hash(password);
-        return users.create({ login, password: passwordHash });
-    },
+        async update(id, { login, password }) {
+            const passwordHash = await common.hash(password);
+            return userRepository.update(id, { login, password: passwordHash });
+        },
 
-    async update(id, { login, password }) {
-        const passwordHash = await hash(password);
-        return users.update(id, { login, password: passwordHash });
-    },
+        delete(id) {
+            return userRepository.delete(id);
+        },
 
-    delete(id) {
-        return users.delete(id);
-    },
-
-    find(mask) {
-        const sql = 'SELECT login from users where login like $1';
-        return users.query(sql, [mask]);
-    },
+        find(mask) {
+            const sql = 'SELECT login from users where login like $1';
+            return userRepository.query(sql, [mask]);
+        },
+    }
 }

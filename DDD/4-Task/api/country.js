@@ -1,5 +1,2 @@
 'use strict';
-
-const db = require('../db.js');
-
-module.exports = db('country');
+module.exports = ({ db }) => db('country');

@@ -3,7 +3,7 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const config = require('./config.js');
 const db = require('./db.js')(config.db);
-const logger = require('./logger.js');
+const logger = require('./logger.js')(config.logger);
 const hash = require('./hash.js')
 
 // toDo createRouting helper function

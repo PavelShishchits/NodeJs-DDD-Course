@@ -17,4 +17,7 @@ module.exports = {
         user: 'marcus',
         password: 'marcus',
     },
+    logger: {
+        path: './log',
+    }
 }

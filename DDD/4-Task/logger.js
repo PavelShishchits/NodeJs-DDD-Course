@@ -66,5 +66,4 @@ class Logger {
       }
 }
 
-// toDo get logger path from config
-module.exports = new Logger('./log');
+module.exports = ({ path }) => new Logger(path);

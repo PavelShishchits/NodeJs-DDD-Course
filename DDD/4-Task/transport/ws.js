@@ -1,9 +1,7 @@
 'use strict';
-
 const { WebSocketServer } = require('ws');
 
-// toDo inject Logger
-module.exports = (routing, port) => {
+module.exports = ({ logger, port }) => (routing) => {
   const ws = new WebSocketServer({ port });
 
   ws.on('connection', (connection, req) => {
@@ -17,16 +15,22 @@ module.exports = (routing, port) => {
       if (!handler) return connection.send('"Not found"', { binary: false });
       const json = JSON.stringify(args);
       const parameters = json.substring(1, json.length - 1);
-      console.log(`${ip} ${name}.${method}(${parameters})`);
+
+      logger.dir({
+        ip,
+        method,
+        args: parameters,
+      });
+
       try {
         const result = await handler(...args);
         connection.send(JSON.stringify(result.rows), { binary: false });
       } catch (err) {
-        console.dir({ err });
+        logger.error(err);
         connection.send('"Server error"', { binary: false });
       }
     });
   });
 
-  console.log(`Api Server running on PORT ${port}`);
+  logger.log(`Api Server running on PORT ${port}`);
 }

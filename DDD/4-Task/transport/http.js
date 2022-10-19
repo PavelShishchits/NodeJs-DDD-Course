@@ -1,8 +1,6 @@
 'use strict';
 const http = require('node:http');
 const { Buffer } = require('node:buffer');
-// toDo inject logger with DI
-const logger = require('../logger.js');
 
 // вычитывает из сокета все буферы, склеить их, и распарсить в JSON
 const recieveArgs = async (req) => {
@@ -30,12 +28,12 @@ const setCorsHeaders = (res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-module.exports = (routing, port) => {
+module.exports = ({ logger, port }) => (routing) => {
     // Front controller pattern (единая точка входа для всех запросов)
     http.createServer(async (req, res) => {
         setCorsHeaders(res);
 
-        const { method, url, socket } = req;
+        const { method, url } = req;
 
         const [name, id] = url.substring(1).split('/');
         const entity = routing[name];
@@ -53,7 +51,6 @@ module.exports = (routing, port) => {
         if (signature.includes('{')) args.push(await recieveArgs(req));
 
         logger.dir({
-            socket,
             method,
             url,
             args,
@@ -63,5 +60,5 @@ module.exports = (routing, port) => {
         res.end(JSON.stringify(result.rows));
     }).listen(port);
 
-    console.log(`Api Server running on PORT ${port}`);
+    logger.log(`Api Server running on PORT ${port}`);
 }

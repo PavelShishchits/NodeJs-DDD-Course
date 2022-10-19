@@ -1,5 +1,4 @@
 'use strict';
-
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
@@ -41,9 +40,9 @@ const prepareFile = async (root, url) => {
     }
 }
 
-module.exports = (root, port) => {
+module.exports = ({ path, port, logger }) => () => {
     http.createServer(async (req, res) => {
-        const file = await prepareFile(root, req.url);
+        const file = await prepareFile(path, req.url);
 
         const statusCode = file.fileFound ? 200 : 404;
         const mimeType = MIME_TYPES[file.fileExtention] || MIME_TYPES.default;
@@ -54,8 +53,8 @@ module.exports = (root, port) => {
 
         file.stream.pipe(res);
 
-        console.log(`Static Server Request: ${req.method} ${req.url} ${statusCode}`);
+        logger.log(`Static Server Request: ${req.method} ${req.url} ${statusCode}`);
     }).listen(port);
 
-    console.log(`Static Server running on PORT:${port}`);
+    logger.log(`Static Server running on PORT:${port}`);
 };

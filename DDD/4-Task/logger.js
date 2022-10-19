@@ -30,6 +30,7 @@ class Logger {
         const date = new Date().toISOString().substring(0, 19);
         const color = COLORS[type];
         const line = date + '\t' + message;
+        console.log(color + line + '\x1b[0m');
         const out = line.replace(/[\n\r]\s*/g, '; ') + '\n';
         this.stream.write(out);
     }

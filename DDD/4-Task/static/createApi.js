@@ -1,69 +1,61 @@
-const crudMap = {
-  create: 'POST',
-  read: 'GET',
-  update: 'PUT',
-  delete: 'DELETE',
-  find: 'GET',
-};
-
-const createApiMethodHttp = ({ url, serviceName, methodName, argsSignature = [] }) => async(...args) => {
-  const method = crudMap[methodName] || 'GET';
-  const id = args[argsSignature.indexOf('id')];
-  const record = args[argsSignature.indexOf('record')];
-
-  return fetch(`${url}/${serviceName}/${id || ''}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    ...(record ? {
-      body: JSON.stringify(record),
-    } : {}),
-  })
-    .then((response) => response.json());
-}
-
-const createApiMethodWs = ({ serviceName, methodName, socket }) => (...args) => {
-  return new Promise((resolve) => {
-    const packet = { name: serviceName, method: methodName, args };
-    socket.send(JSON.stringify(packet));
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      resolve(data);
-    };
-  })
-};
-
-const createApiMethodMap = {
-  http: createApiMethodHttp,
-  ws: createApiMethodWs,
-  default: createApiMethodHttp,
-}
-
-export const createApi = (url, structure) => {
+const scaffoldIterator = (structure, handler) => {
   const api = {};
-  const transport = url.substring(0, url.indexOf('://'));
   const services = Object.keys(structure);
-  const method = createApiMethodMap[transport] || createApiMethodMap.default;
-  const socket = transport === 'ws' ? new WebSocket(url) : null; 
 
   for (const serviceName of services) {
-    api[serviceName] = Object.entries(structure[serviceName]).reduce((accumulator, [methodName, requestParams]) => {
-      return {
-        ...accumulator,
-        [methodName]: method({
-          url: url,
-          serviceName: serviceName,
-          methodName: methodName,
-          argsSignature: requestParams,
-          socket: socket,
-        }),
-      };
-    }, {});
+    api[serviceName] = {};
+    const serviceMethods = Object.keys(structure[serviceName]);
+    for (const serviceMethod of serviceMethods) {
+       api[serviceName][serviceMethod] = handler(serviceName, serviceMethod);
+    }
   }
 
-  return {
-    api,
-    socket,
-  };
+  return api;
+}
+
+const scaffoldWs = (url, structure) => {
+  const socket = new WebSocket(url);
+
+  const api = scaffoldIterator(structure, (serviceName, serviceMethod) => (...args) => {
+    return new Promise((resolve) => {
+      const packet = { name: serviceName, method: serviceMethod, args };
+      socket.send(JSON.stringify(packet));
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        resolve(data);
+      };
+    });
+  })
+
+  return new Promise((resolve) => {
+    socket.addEventListener('open', () => {
+      resolve(api);
+    })
+  })
+}
+
+const scaffoldHttp = (url, structure) => {
+  const api = scaffoldIterator(structure, (serviceName, serviceMethod) => (...args) => {
+    return fetch(`${url}/${serviceName}/${serviceMethod}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: args }),
+    })
+        .then((response) => response.json());
+  })
+
+  return Promise.resolve(api);
+}
+
+const transportsCollection = {
+  http: scaffoldHttp,
+  ws: scaffoldWs,
+  default: scaffoldHttp,
+}
+
+export const scaffold = (url, structure) => {
+  const transport = url.substring(0, url.indexOf('://'));
+  return (transportsCollection[transport] || transportsCollection['default'])(url, structure);
 }

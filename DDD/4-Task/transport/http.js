@@ -20,7 +20,7 @@ const receiveArgs = async (req) => {
         buffers.push(chunk);
     }
     const data = Buffer.concat(buffers).toString();
-    return JSON.parse(data).data;
+    return JSON.parse(data);
 };
 
 module.exports = ({ logger, port }) => (routing) => {
@@ -39,7 +39,7 @@ module.exports = ({ logger, port }) => (routing) => {
         const handler = entity[method];
         if (!handler) return res.end('Not found');
 
-        const args = await receiveArgs(req);
+        const { data: args } = await receiveArgs(req);
 
         logger.dir({
             url,

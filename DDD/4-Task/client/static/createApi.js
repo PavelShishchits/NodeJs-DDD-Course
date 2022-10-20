@@ -31,7 +31,7 @@ const scaffoldWs = (url, structure) => {
     socket.addEventListener('open', () => {
       resolve(api);
     })
-  })
+  });
 }
 
 const scaffoldHttp = (url, structure) => {

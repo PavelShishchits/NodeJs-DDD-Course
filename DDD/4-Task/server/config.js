@@ -3,7 +3,7 @@
 module.exports = {
     static: {
         port: 6002,
-        path: './static',
+        path: '../client/static',
     },
     api: {
         port: 6001,

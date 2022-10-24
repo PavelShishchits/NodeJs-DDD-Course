@@ -1,8 +1,8 @@
 'use strict';
-
 const path = require('node:path');
 const util = require('node:util');
 const fs = require('node:fs');
+const { promiseResponseToBool } = require('./utils/index');
 
 const COLORS = {
     info: '\x1b[1;37m',
@@ -14,12 +14,22 @@ const COLORS = {
 
 class Logger {
     constructor(logPath) {
-        // toDo if folder isn't exist -> create it
         this.path = logPath;
-        const date = new Date().toISOString().substring(0, 10);
-        const filePath = path.join(this.path, `${date}.log`);
+        this.init();
+    }
+
+    init() {
+        const filePath = this.createFilePath();
         this.stream = fs.createWriteStream(filePath, { flags: 'a' });
-        this.regexp = new RegExp(path.dirname(this.path), 'g');
+        this.regexp = new RegExp(path.dirname(filePath), 'g');
+    }
+
+    createFilePath() {
+        // const dirExist = await fs.promises.access(this.path).then(...promiseResponseToBool);
+        // let dirPath = dirExist ? this.path : await fs.promises.mkdir(this.path, { recursive: true });
+        let dirPath = this.path;
+        const date = new Date().toISOString().substring(0, 10);
+        return path.join(dirPath, `${date}.log`);
     }
 
     close() {
@@ -32,7 +42,7 @@ class Logger {
         const line = date + '\t' + message;
         console.log(color + line + '\x1b[0m');
         const out = line.replace(/[\n\r]\s*/g, '; ') + '\n';
-        this.stream.write(out);
+        this.stream && this.stream.write(out);
     }
 
     log(...args) {
@@ -43,27 +53,27 @@ class Logger {
     dir(...args) {
         const msg = util.inspect(...args);
         this.write('info', msg);
-      }
+    }
     
-      debug(...args) {
+    debug(...args) {
         const msg = util.format(...args);
         this.write('debug', msg);
-      }
+    }
     
-      error(...args) {
+    error(...args) {
         const msg = util.format(...args).replace(/[\n\r]{2,}/g, '\n');
         this.write('error', msg.replace(this.regexp, ''));
-      }
-    
-      system(...args) {
+    }
+
+    system(...args) {
         const msg = util.format(...args);
         this.write('system', msg);
-      }
-    
-      access(...args) {
+    }
+
+    access(...args) {
         const msg = util.format(...args);
         this.write('access', msg);
-      }
+    }
 }
 
 module.exports = ({ path }) => new Logger(path);

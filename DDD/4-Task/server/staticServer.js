@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const { promiseResponseToBool } = require('./utils/index');
 
 const MIME_TYPES = {
     default: 'application/octet-stream',
@@ -14,8 +15,6 @@ const MIME_TYPES = {
     ico: 'image/x-icon',
     svg: 'image/svg+xml',
 };
-
-const promiseResponseToBool = [() => true, () => false];
 
 const prepareFile = async (root, url) => {
     const staticPath = path.join(process.cwd(), root);

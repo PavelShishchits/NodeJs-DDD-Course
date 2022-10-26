@@ -1,0 +1,1 @@
+module.exports = (options) => require(`./${options.implementation}.js`)(options);

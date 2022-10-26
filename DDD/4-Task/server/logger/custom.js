@@ -2,7 +2,7 @@
 const path = require('node:path');
 const util = require('node:util');
 const fs = require('node:fs');
-const { promiseResponseToBool } = require('./utils/index');
+const { promiseResponseToBool } = require('../utils/index');
 
 const COLORS = {
     info: '\x1b[1;37m',

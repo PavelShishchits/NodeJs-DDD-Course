@@ -19,5 +19,6 @@ module.exports = {
     },
     logger: {
         path: './log',
+        implementation: 'custom' // native | custom | pino
     }
 }
